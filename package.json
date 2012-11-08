@@ -1,0 +1,16 @@
+{
+  "name": "server-push",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jsintime/server-push.git"
+  },
+  "dependencies" : {
+    "express"   :  "*",
+    "jade": "*",
+    "ws": "*"
+  },
+  "engine": {
+    "node": "*"
+  }
+}
