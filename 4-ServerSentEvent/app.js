@@ -23,12 +23,13 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-/* Global vars used */
+/* Global var used as a sample data */
 var sampleData = {
 	'value' : 'azerty',
 	'date' : new Date().getTime()
 };
 
+// array containing the responses for the web clients
 var responses = [];
 
 
@@ -40,9 +41,8 @@ app.all('*', function(req, res, next){
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
-
   res.header('Charset', 'utf-8');
-
+  // specific headers for SSE response
   res.header('Content-Type', 'text/event-stream');
   res.header('Cache-Control', 'no-cache');
   res.header('Connection', 'keep-alive');
@@ -57,31 +57,23 @@ app.post('/changes', function(req, res){
 	sampleData.value = req.body.newValue;
 	sampleData.date = req.body.newDate;
 
+  // for every web clients, we send the new response 
 	responses.forEach(function(currentRes, index, array){
-	//for (var i=0; i<responses.length; i++){
-		//var response = responses[i];
-
-		//response.write(JSON.stringify(sampleData)+'\n');
-		//response.write("data: ooddddd\n\n");
-
 		currentRes.write("data: {\n");
 		currentRes.write("data: \"value\": \""+sampleData.value+"\",\n");
 		currentRes.write("data: \"date\": "+sampleData.date+"\n");
 		currentRes.write("data: }\n\n");
-
-
-		console.log('SENT OK');
 	});
+
+  console.log("Responses with new information sent");
 
 	res.end();
 });
 
 
 app.get('/streamSSE', function(req, res){
-	console.log("SSE");
-
+	console.log("SSE request intercepted");
 	responses.push(res);
-
 });
 
 

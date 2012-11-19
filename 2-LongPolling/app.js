@@ -23,12 +23,13 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-/* Global vars used */
+/* Global var used as a sample data */
 var sampleData = {
 	'value' : 'azerty',
 	'date' : new Date().getTime()
 };
 
+// array containing the responses for the web clients
 var responses = [];
 
 
@@ -56,18 +57,15 @@ app.post('/changes', function(req, res){
 
 	var m;
 
+	// for every web clients, we send the response
 	while (m = responses.shift()){
-		
 		try{
 			m.send(sampleData);	
 		} catch(e){
-			console.log('response already sent (connexion closed)');
+			console.log("response already sent (connexion is closed)");
 		}
-		
-
-
-		console.log('SENT OK');
 	}
+	console.log("Responses with new information sent");
 
 	res.end();
 });
@@ -76,16 +74,15 @@ app.post('/changes', function(req, res){
 
 
 app.get('/longpolling', function(req, res){
-	console.log("long");
+  	console.log("Long Polling request intercepted");
 
+	// push the response into the array
 	responses.push(res);
 
-	var requestDate = new Date().getTime();
-	
-	var timer = setInterval(checkExpired, 1000);
+	var requestDate = new Date().getTime(),
+		timer = setInterval(checkExpired, 1000);
 
 	function checkExpired(){
-
 		var expiration = new Date().getTime() - 30000;
 
 		// close out request older than 30 seconds
@@ -98,8 +95,6 @@ app.get('/longpolling', function(req, res){
 	
 	
 });
-
-
 
 
 

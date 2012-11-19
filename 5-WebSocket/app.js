@@ -29,12 +29,13 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-/* Global vars used */
+/* Global var used as a sample data */
 var sampleData = {
 	'value' : 'azerty',
 	'date' : new Date().getTime()
 };
 
+// array containing the responses for the web clients
 var sockets = [];
 
 
@@ -46,10 +47,8 @@ app.all('*', function(req, res, next){
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
-
   res.header('Charset', 'utf-8');
-
-  res.header('Content-Type', 'text/event-stream');
+  res.header('Content-Type', 'application/json');
   res.header('Cache-Control', 'no-cache');
   res.header('Connection', 'keep-alive');
 
@@ -58,27 +57,27 @@ app.all('*', function(req, res, next){
 
 
 
-
-
-
 wss.on('connection', function(ws) {
 
-    sockets.push(ws);
+  console.log("new connection");
 
-    ws.on('message', function(message) {
-        console.log('received: %s', message);
+  sockets.push(ws);
 
-        var newData = JSON.parse(message);
+  ws.on('message', function(message) {
+      console.log('received new data: %s', message);
 
-        sampleData.value = newData.value;
-        sampleData.date = newData.date;
+      var newData = JSON.parse(message);
 
-        sockets.forEach(function(currentWS, index, array){
-            currentWS.send(message);
-        });
+      sampleData.value = newData.value;
+      sampleData.date = newData.date;
 
-        
-    });
+      sockets.forEach(function(currentWS, index, array){
+          currentWS.send(message);
+      });
+
+      console.log("New information sent through the channel");
+
+  });
     
 });
 

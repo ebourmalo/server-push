@@ -25,10 +25,6 @@
 		<script type="text/javascript" src="./../jquery-1.8.2.min.js"></script>
 		<script>
 
-			// --------------------------------------
-			// Test code
-			// --------------------------------------
-
 			$('#div_submit button').click(function(){
 				sendChanges();
 			});
@@ -46,50 +42,37 @@
 					url: "http://localhost:4000/changes",
 					type: "POST",
 					dataType: "json",
-					data: newData,
-					success: function(data, textStatus, jqXHR){
-						console.log('OK');
-						
-						
-					},
-					error: function(jqXHR, textStatus, errorThrown){
-						console.log(jqXHR);
-						console.log(textStatus);
-					}
+					data: newData
+				}).done(function(data, textStatus, jqXHR){
+					console.log('changes saved');
+				}).fail(function(jqXHR, textStatus, errorThrown){
+					console.log(jqXHR);
+					console.log(textStatus);
 				});
 			}
 			
-
+			// check the compatibility of Http Streaming with the browser
 			if (!('XMLHttpRequest' in window && 'multipart' in window.XMLHttpRequest.prototype)) {
-                alert('Comet Http Streaming is not supported in your browser !');
-                throw new Error('Comet Http Streaming is not supported in your browser !');
+                var errorMsg = 'Http Streaming is not supported in this browser';
+                throw new Error(errorMsg);
             }
 
 			
 
             (function sendRequest(){
-				var prepareUrl = 'http://localhost:4000/httpStreaming';
 
 				var xhr = new XMLHttpRequest();
-
-				xhr.multipart = true; //注意这里很重要！！
-
-				xhr.open('GET', prepareUrl);
-
-
+				xhr.multipart = true;
+				xhr.open('GET', 'http://localhost:4000/httpStreaming');
 
 				xhr.onreadystatechange = function(){
-					// XMLHttpRequest.DONE
+					// if XMLHttpRequest.DONE
 				    if (xhr.readyState == 4){
 
 				        console.log('data-reached:'+xhr.responseText);
 				        console.log(JSON.parse(xhr.responseText));
-				        var data = JSON.parse(xhr.responseText);
-				        
-
-
-						var responseTime = new Date().getTime() - data.date;
-						//newDate.setTime();
+				        var data = JSON.parse(xhr.responseText),
+				        	responseTime = new Date().getTime() - data.date;
 
 						$('#data #value').text(data.value);
 						$('#data #date').text('Updated in '+responseTime+' ms');

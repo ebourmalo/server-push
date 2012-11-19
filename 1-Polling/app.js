@@ -23,7 +23,7 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-/* Global vars used */
+/* Global var used as a sample data */
 var sampleData = {
 	'value' : 'azerty',
 	'date' : new Date().getTime()
@@ -51,6 +51,7 @@ app.post('/changes', function(req, res){
 
 
 app.get('/polling', function(req, res){
+  console.log("Polling request intercepted");
   res.send(sampleData);
 });
 

@@ -23,12 +23,13 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-/* Global vars used */
+/* Global var used as a sample data */
 var sampleData = {
 	'value' : 'azerty',
 	'date' : new Date().getTime()
 };
 
+// array containing the responses for the web clients
 var responses = [];
 
 
@@ -40,10 +41,9 @@ app.all('*', function(req, res, next){
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
-
   res.header('Charset', 'utf-8');
-
   res.header('Content-Type', 'text/plain');
+  // specific headers for http streaming
   res.header('Content-Type', 'multipart/x-mixed-replace;boundary="parisjs"');
   res.header('Connection', 'keep-alive');
 
@@ -57,25 +57,23 @@ app.post('/changes', function(req, res){
 	sampleData.value = req.body.newValue;
 	sampleData.date = req.body.newDate;
 
-
+  // for every web clients, we send the new response 
 	responses.forEach(function(currentRes, index, array){
 		currentRes.write('--parisjs\n');
 		currentRes.write("Content-Type: application/json;charset=utf-8" + "\n\n");
 		currentRes.write(JSON.stringify(sampleData)+'\n');
 		currentRes.write('--parisjs\n');
-
-		console.log('SENT OK');
 	});
+
+  console.log("Responses with new information sent");
 
 	res.end();
 });
 
 
 app.get('/httpStreaming', function(req, res){
-	console.log("httpS");
-
+  console.log("HttpStreaming request intercepted");
 	responses.push(res);
-
 });
 
 
